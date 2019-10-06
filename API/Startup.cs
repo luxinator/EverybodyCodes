@@ -31,19 +31,30 @@ namespace API
         {
             services.AddDbContext<CameraContext>(options =>
                 options.UseSqlite(Configuration["ConnectionString"]));
-            
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            
+            services.AddCors(options =>
+            {
+                options.AddPolicy("DevCors", builder =>
+                {
+                    builder.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader();
+                });
+            });
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            
             if (env.IsDevelopment())
             {
+                app.UseCors("DevCors");
                 app.UseDeveloperExceptionPage();
             }
             else
             {
+                throw new Exception("Please run this app in Development mode: Set 'ASPNETCORE_ENVIRONMENT=Development' in your shell ");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
@@ -56,7 +67,5 @@ namespace API
                     template: "{controller}/{action=Index}/{id?}");
             });
         }
-
-       
     }
 }

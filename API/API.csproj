@@ -12,10 +12,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="DTO" />
-    </ItemGroup>
-
-    <ItemGroup>
       <None Update="cameras-defb.csv">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
