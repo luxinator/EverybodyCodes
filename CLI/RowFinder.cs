@@ -6,68 +6,55 @@ using System.Text.RegularExpressions;
 
 namespace CLI
 {
-    public class RowFinder : IDisposable
+    public class RowFinder
     {
-        private readonly FileStream data;
-        
+        private readonly string dataFile;
+
         public RowFinder(string dataFile)
         {
-            data = File.OpenRead(dataFile);
+            this.dataFile = dataFile;
         }
-        
+
         public void PrintMatchedRow(string searchString)
         {
             var pattern = new Regex(searchString);
-            
-            using (var reader = new StreamReader(data))
+            foreach (var line in GetLines())
             {
-                string line;
-
-                while ((line = reader.ReadLine()) != null)
+                var m = pattern.Match(line);
+                if (m.Success)
                 {
-                    var m = pattern.Match(line);
-                    if (m.Success)
-                    {
-                        Console.WriteLine(line);
-                    }
+                    Console.WriteLine(line);
                 }
             }
         }
 
         public void PrintContainingRow(string searchString)
         {
-            using (var reader = new StreamReader(data))
+            foreach (var line in GetLines())
             {
-                string line;
-
-                while ((line = reader.ReadLine()) != null)
-                {
-                    if (line.Contains(searchString))
-                    {
-                        Console.WriteLine(line);
-                    }
-                }
+                if (line.Contains(searchString))
+                    Console.WriteLine(line);
             }
-            
         }
 
         public void DumpFileToStdOut()
         {
+            foreach (var line in GetLines())
+                Console.WriteLine(line);
+        }
+
+
+        private IEnumerable<string> GetLines()
+        {
+            using (var data = File.OpenRead(dataFile))
             using (var reader = new StreamReader(data))
             {
                 string line;
                 while ((line = reader.ReadLine()) != null)
                 {
-                    Console.WriteLine(line);
+                    yield return line;
                 }
-
             }
-
-        }
-        
-        public void Dispose()
-        {
-            data?.Dispose();
         }
     }
 }

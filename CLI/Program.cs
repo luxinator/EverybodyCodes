@@ -12,7 +12,6 @@ namespace CLI
         {
             Parser.Default.ParseArguments<Options>(args)
                 .WithParsed<Options>(opts => Start(opts));
-
         }
 
         private static void Start(Options opts)
@@ -24,16 +23,21 @@ namespace CLI
                 Console.WriteLine($"Could not open {file}");
                 return;
             }
-            
-            using (var rf = new RowFinder(file))
+
+            var rf = new RowFinder(file);
+
+            if (!string.IsNullOrEmpty(opts.Search))
             {
-                if(!string.IsNullOrEmpty(opts.Search))
-                    rf.PrintContainingRow(opts.Search);
-                else if(!string.IsNullOrEmpty(opts.Regex))
-                    rf.PrintContainingRow(opts.Regex);
-                
+                rf.PrintContainingRow(opts.Search);
             }
-            
+            else if (!string.IsNullOrEmpty(opts.Regex))
+            {
+                rf.PrintMatchedRow(opts.Regex);
+            }
+            else
+            {
+                rf.DumpFileToStdOut();
+            }
         }
     }
 }
